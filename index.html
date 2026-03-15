@@ -631,7 +631,7 @@
         <span style="color:#ffd700; font-size:9px;">📝 내 생존수:</span>
         <input type="text" id="customSurvivorInput" placeholder="예: 5,12,23,34,41,45" style="flex:1; min-width:120px; background:#222; border:1px solid #ffd700; border-radius:40px; padding:4px 8px; color:white; font-size:8px;">
         <button class="apply-btn" style="height:24px; padding:0 6px;" onclick="saveCustomSurvivors()">저장</button>
-        <!-- 초기화 버튼 추가 (빨간색) -->
+        <!-- 초기화 버튼 (빨간색) -->
         <button class="apply-btn" style="height:24px; padding:0 6px; background:#ff4444;" onclick="resetCustomSurvivors()">초기화</button>
     </div>
 
@@ -690,6 +690,7 @@
         <button class="btn-sub" onclick="showComboList()">📋 생성조합</button>
         <button class="btn-sub" onclick="openGamePopup()">🎮 게임</button>
         <button class="btn-help" onclick="openHelpPopup()">❓ 도움말</button>
+        <button class="btn-sub" onclick="openBacktestPopup()">📊 백테스트</button>   <!-- 새 버튼 -->
     </div>
 
     <div class="fixed-numbers">
@@ -827,10 +828,10 @@
         <div class="popup-title">❓ 도움말 (상세)</div>
         <div style="font-size:9px; color:#ccc; line-height:1.6; max-height:60vh; overflow-y:auto; padding-right:4px;">
             <p><strong style="color:#ffd700;">🔢 압축 슬라이더</strong> : 1~14까지 선택. AI 또는 특수분석 모드에서 사용할 숫자 개수입니다. 값이 작을수록 상위 점수의 숫자만 사용합니다. (기본 9)</p>
-            <p><strong style="color:#ffd700;">🤖 AI / 🎯 특수분석 모드</strong> : AI 모드는 자동 생존수(최근 빈도 상위 20개)를 기반으로 패턴 분석을 하고, 특수분석 모드는 내가 입력한 28수를 기반으로 가중치 분석을 합니다. 두 모드가 서로 다른 생존수를 사용합니다. 특수분석 모드에서는 자동 생존수에 없는 내 번호에 가점(+5)이 부여됩니다.</p>
+            <p><strong style="color:#ffd700;">🤖 AI / 🎯 특수분석 모드</strong> : AI 모드는 자동 생존수(최근 5회 출현 번호 18수 + 6~21회 미출현 번호 10수)를 기반으로 패턴 분석을 하고, 특수분석 모드는 내가 입력한 28수를 기반으로 가중치 분석을 합니다. 특수분석 모드에서는 자동 생존수에 없는 내 번호에 가점(+5)이 부여됩니다.</p>
             <p><strong style="color:#ffd700;">간격(주) / 회차(개)</strong> : 기준 회차로부터 몇 주 간격으로 몇 개의 회차를 분석할지 설정합니다. 예: 간격 2주, 회차 10개 → 기준 회차 직전부터 2주 간격으로 10개 회차를 수집합니다.</p>
             <p><strong style="color:#ffd700;">교환 개수</strong> : 트레이드에서 교환할 숫자 개수 (1~8개).</p>
-            <p><strong style="color:#ffd700;">🔄 트레이드</strong> : AI 집합과 특수분석 집합 간에 점수가 낮은 번호와 높은 번호를 교환합니다. 트레이드 후에는 '추천'이라는 통합14수가 생성되고, 유실된 번호가 표시됩니다. 유실된 번호 중 트레이드 전 교집합이었던 번호는 자동으로 고정수에 등록됩니다.</p>
+            <p><strong style="color:#ffd700;">🔄 트레이드</strong> : AI 집합과 특수분석 집합 간에 상대 집합에 없는 번호 중 점수가 높은 번호를 서로 교환합니다. 교환 후에는 '추천'이라는 통합14수가 생성되고, 유실된 번호가 표시됩니다. 유실된 번호 중 트레이드 전 교집합이었던 번호는 자동으로 고정수에 등록됩니다.</p>
             <p><strong style="color:#ffd700;">1조합 / 5조합 / 10조합</strong> : 현재 선택된 모드(AI 또는 특수분석)의 압축 숫자 풀에서 조합을 생성합니다. 고정수가 있으면 1~2개 포함되고, 고정수가 없으면 합계, 홀짝, 연속번호 등의 기본 필터가 적용됩니다. (1조합 버튼은 주황색, 5/10조합은 청록색)</p>
             <p><strong style="color:#ffd700;">통합5 / 통합10</strong> : 트레이드 후 생성된 통합14수에서 조합을 생성합니다. (트레이드 후에만 사용 가능)</p>
             <p><strong style="color:#ffd700;">B바구니</strong> : 통합14수(추천) + 유실번호 + 교집합 + 미사용통합 + 이동번호(AI↔특수) + 미선택 내 번호를 모두 모아 전체 풀을 보여주고, 그중에서 5개의 조합을 생성합니다.</p>
@@ -838,10 +839,10 @@
             <p><strong style="color:#ffd700;">📊 당첨확인</strong> : 저장된 조합과 입력한 당첨번호(또는 해당 회차의 실제 당첨번호)를 비교하여 등수를 표시합니다. '저장' 버튼으로 번호를 저장하면 상태창에 자동 반영됩니다.</p>
             <p><strong style="color:#ffd700;">📋 생성조합</strong> : 최근 생성된 조합 목록을 보여줍니다. 각 조합 옆의 '저장' 버튼으로 보관함에 저장할 수 있습니다.</p>
             <p><strong style="color:#ffd700;">🎮 게임</strong> : 터치 게임(공 튕기며 숫자 선택)을 즐길 수 있습니다.</p>
+            <p><strong style="color:#ffd700;">📊 백테스트</strong> : 선택한 회차 범위(예: 1100~1200)에 대해 트레이드 후 추천(통합14수)에 실제 당첨번호가 몇 개 포함되는지 평균과 분포를 보여줍니다. 현재 설정(간격, 회차 수, 생존수, 고정수 등)이 그대로 적용됩니다.</p>
             <p><strong style="color:#ffd700;">초기화 / 새로고침</strong> : '초기화'는 저장된 조합을 모두 삭제합니다. '새로고침'은 페이지를 다시 로드합니다.</p>
             <p><strong style="color:#ffd700;">🌐 네이버</strong> : 네이버로 이동합니다.</p>
             <p><strong style="color:#ffd700;">📦 보관함</strong> : 저장한 조합들을 확인하고 관리할 수 있습니다.</p>
-            <p><strong style="color:#ffd700;">⏳ 추가</strong> : 준비 중인 기능입니다.</p>
             <p><strong style="color:#ffd700;">🔍 번호 추적</strong> : 고정수 옆 입력창에 번호를 입력하고 🔍 버튼을 누르면 상태창 하단에 해당 번호가 현재 어떤 집합에 속해 있는지 표시됩니다. (AI, 특수, 통합, 유실, 생존, 고정, 이동 등)</p>
         </div>
         <div style="display:flex; justify-content:center; margin-top:16px;">
@@ -858,6 +859,31 @@
         <div id="statusZoomContent" class="status-zoom-content"></div>
         <div style="display:flex; justify-content:center; margin-top:16px;">
             <button class="apply-btn" onclick="closeStatusZoomPopup()" style="width:100px;">닫기</button>
+        </div>
+    </div>
+</div>
+
+<!-- 백테스트 팝업 -->
+<div id="backtestPopup" class="popup-overlay" style="display:none;">
+    <div class="popup-content">
+        <button class="popup-close" onclick="closeBacktestPopup()">&times;</button>
+        <div class="popup-title">📊 백테스트</div>
+        <div style="margin:10px 0; display:flex; gap:5px; justify-content:center; flex-wrap:wrap;">
+            <div>
+                <label style="color:#ffd700; font-size:9px;">시작 회차</label>
+                <input type="number" id="backtestStart" min="901" max="1215" value="1100" style="width:60px; background:#222; border:1px solid #ffd700; border-radius:20px; color:white; text-align:center; padding:4px;">
+            </div>
+            <div>
+                <label style="color:#ffd700; font-size:9px;">종료 회차</label>
+                <input type="number" id="backtestEnd" min="901" max="1215" value="1200" style="width:60px; background:#222; border:1px solid #ffd700; border-radius:20px; color:white; text-align:center; padding:4px;">
+            </div>
+            <button class="apply-btn" onclick="runBacktest()" style="height:28px;">실행</button>
+        </div>
+        <div id="backtestResult" style="font-size:9px; color:#ccc; max-height:50vh; overflow-y:auto; padding:4px;">
+            실행 버튼을 누르세요.
+        </div>
+        <div style="display:flex; justify-content:center; margin-top:16px;">
+            <button class="apply-btn" onclick="closeBacktestPopup()" style="width:100px;">닫기</button>
         </div>
     </div>
 </div>
@@ -1298,10 +1324,9 @@ function showToast(msg) {
     setTimeout(() => t.style.display = 'none', 800);
 }
 
-// 생존수 저장 (트레이드 해제 및 초기화 포함)
+// 생존수 저장
 function saveCustomSurvivors() {
     let input = document.getElementById('customSurvivorInput').value;
-    // 쉼표 또는 공백으로 구분된 숫자 파싱
     let numbers = input.split(/[,\s]+/).map(n => parseInt(n.trim())).filter(n => !isNaN(n) && n >= 1 && n <= 45);
     
     if (numbers.length === 0) {
@@ -1309,48 +1334,37 @@ function saveCustomSurvivors() {
         return;
     }
     
-    // 중복 제거 및 정렬
     customSurvivors = [...new Set(numbers)].sort((a,b)=>a-b);
     
-    // 최대 28개 제한
     if (customSurvivors.length > 28) {
         customSurvivors = customSurvivors.slice(0, 28);
         showToast('최대 28개까지만 저장됩니다');
     }
     
-    // 로컬 스토리지에 저장
     localStorage.setItem('customSurvivors', JSON.stringify(customSurvivors));
-    
-    // 입력창에 표시
     document.getElementById('customSurvivorInput').value = customSurvivors.join(', ');
     
-    // 트레이드 상태 초기화
     tradeActive = false;
     document.getElementById('tradeBtn').classList.remove('active');
     
-    // 저장된 당첨번호 초기화
     customWinningNumbers = null;
     customBonus = null;
     localStorage.removeItem('lastWinningNumbers');
     
-    // 분석 재실행
     analyze();
-    
-    showToast(`✅ ${customSurvivors.length}개 저장됨 (적용 완료)`);
+    showToast(`✅ ${customSurvivors.length}개 저장됨`);
 }
 
-// 생존수 초기화 버튼용 함수
+// 생존수 초기화
 function resetCustomSurvivors() {
     if (confirm('생존수를 모두 초기화할까요?')) {
         customSurvivors = [];
         localStorage.removeItem('customSurvivors');
         document.getElementById('customSurvivorInput').value = '';
         
-        // 트레이드 상태 초기화
         tradeActive = false;
         document.getElementById('tradeBtn').classList.remove('active');
         
-        // 저장된 당첨번호 초기화
         customWinningNumbers = null;
         customBonus = null;
         localStorage.removeItem('lastWinningNumbers');
@@ -1397,27 +1411,80 @@ function analyze() {
         return;
     }
 
-    // 1. 자동 생존수 (최근 20회 빈도 상위)
+    // --- 새로운 생존수 생성 로직 (18+10) ---
+    // 최근 5회차 데이터 (보너스 제외)
+    let last5Rounds = FULL_DATA.filter(r => r[0] < currentBaseRound).slice(0, 5);
+    let appearedLast5 = new Set();
+    last5Rounds.forEach(r => r.slice(1, 7).forEach(n => appearedLast5.add(n)));
+
+    // 6~21회차 데이터 (보너스 제외)
+    let range6to21 = FULL_DATA.filter(r => {
+        let diff = currentBaseRound - r[0];
+        return diff >= 6 && diff <= 21;
+    });
+    let appeared6to21 = new Set();
+    range6to21.forEach(r => r.slice(1, 7).forEach(n => appeared6to21.add(n)));
+
+    // 전체 빈도 (collectedRounds 기준)
     let allNumbers = [];
     collectedRounds.forEach(round => allNumbers.push(...round.slice(1, 7)));
     let freq = {};
     allNumbers.forEach(n => freq[n] = (freq[n] || 0) + 1);
-    let sortedByFreq = Object.entries(freq)
-        .map(([num, cnt]) => ({ num: parseInt(num), cnt }))
-        .sort((a, b) => b.cnt !== a.cnt ? b.cnt - a.cnt : a.num - b.num);
-    autoSurvivors = sortedByFreq.slice(0, 20).map(x => x.num).sort((a,b)=>a-b); // 전역 변수로 저장
+    for (let i = 1; i <= 45; i++) if (!freq[i]) freq[i] = 0;
 
-    // 2. 패턴 점수 (전체 번호 대상)
-    patternScores = analyzeExcelVisual(collectedRounds);
+    // 그룹 A: 최근 5회 출현 번호 (중복 제거)
+    let groupA = Array.from(appearedLast5).map(num => ({ num, freq: freq[num] }));
+    groupA.sort((a, b) => b.freq - a.freq || a.num - b.num);  // 빈도 높은 순
 
-    // 3. 생존수 결정 (사용자 입력 여부에 따라)
-    if (customSurvivors.length > 0) {
-        survivors = customSurvivors.slice(); // 사용자 입력 생존수 (전역 변수)
-    } else {
-        survivors = autoSurvivors.slice();   // 자동 생존수
+    // 그룹 B: 6~21회 미출현 번호 (1~45 중 appeared6to21에 없는 번호)
+    let groupB = [];
+    for (let i = 1; i <= 45; i++) {
+        if (!appeared6to21.has(i)) {
+            groupB.push({ num: i, freq: freq[i] });
+        }
+    }
+    groupB.sort((a, b) => a.freq - b.freq || a.num - b.num);  // 빈도 낮은 순
+
+    // 선택
+    let selected = [];
+    let takeA = Math.min(18, groupA.length);
+    selected.push(...groupA.slice(0, takeA).map(x => x.num));
+
+    let takeB = Math.min(10, groupB.length);
+    selected.push(...groupB.slice(0, takeB).map(x => x.num));
+
+    // 부족분 보충
+    if (selected.length < 28) {
+        let need = 28 - selected.length;
+        let selectedSet = new Set(selected);
+        let remainingA = groupA.slice(takeA).filter(x => !selectedSet.has(x.num));
+        let remainingB = groupB.slice(takeB).filter(x => !selectedSet.has(x.num));
+        // 부족분은 빈도 낮은 순으로 채우기 위해 B(낮은순) + A(낮은순으로 뒤집기)
+        remainingA.reverse(); // 이제 낮은 순
+        let candidates = [...remainingB, ...remainingA];
+        for (let i = 0; i < candidates.length && need > 0; i++) {
+            if (!selectedSet.has(candidates[i].num)) {
+                selected.push(candidates[i].num);
+                selectedSet.add(candidates[i].num);
+                need--;
+            }
+        }
     }
 
-    // 4. 특수 모드 점수 계산 (생존수 기반)
+    autoSurvivors = selected.sort((a, b) => a - b);
+    // --- 생존수 로직 끝 ---
+
+    // 패턴 점수 (전체 번호 대상)
+    patternScores = analyzeExcelVisual(collectedRounds);
+
+    // 생존수 결정 (사용자 정의 우선)
+    if (customSurvivors.length > 0) {
+        survivors = customSurvivors.slice();
+    } else {
+        survivors = autoSurvivors.slice();
+    }
+
+    // 특수 모드 점수 계산
     excludeScores = {};
     survivors.forEach(num => {
         let score = 0;
@@ -1427,14 +1494,13 @@ function analyze() {
         score += freqRecent10 * 2.0;
         if (!past15.some(r => r.slice(1,7).includes(num))) score += 7.0;
         if (num >= 20 && num <= 35) score += 1.5;
-        // 사용자 생존수 중 자동 생존수에 없는 번호에 가점 (특수 모드 전용)
         if (customSurvivors.length > 0 && !autoSurvivors.includes(num)) {
             score += 5.0;
         }
         excludeScores[num] = score;
     });
 
-    // 5. 글로벌 랭킹 (트레이드용)
+    // 글로벌 랭킹
     let aiRanking = [];
     for (let i = 1; i <= 45; i++) aiRanking.push({ num: i, score: patternScores[i] });
     aiRanking.sort((a, b) => b.score !== a.score ? b.score - a.score : a.num - b.num);
@@ -1446,12 +1512,11 @@ function analyze() {
     excludeRankMap = {};
     excludeRanking.forEach((item, idx) => { excludeRankMap[item.num] = idx + 1; });
     for (let i = 1; i <= 45; i++) {
-        if (!excludeRankMap[i]) excludeRankMap[i] = 21; // 기본값
+        if (!excludeRankMap[i]) excludeRankMap[i] = 21;
     }
 
-    // 6. 각 모드의 최종 집합 생성
+    // 각 모드의 최종 집합 생성
     if (customSurvivors.length > 0) {
-        // 사용자 생존수 있는 경우: 두 모드 모두 생존수에서 선택
         let aiCandidates = survivors.map(num => ({ num, score: patternScores[num] }));
         aiCandidates.sort((a, b) => b.score !== a.score ? b.score - a.score : a.num - b.num);
         original_ai = aiCandidates.slice(0, currentCompress).map(x => x.num).sort((a,b)=>a-b);
@@ -1460,13 +1525,10 @@ function analyze() {
         excludeCandidates.sort((a, b) => b.score !== a.score ? b.score - a.score : a.num - b.num);
         original_exclude = excludeCandidates.slice(0, currentCompress).map(x => x.num).sort((a,b)=>a-b);
     } else {
-        // 사용자 생존수 없는 경우: 기존 로직
-        // 특수 모드: 자동 생존수에서 선택
         let excludeCandidates = autoSurvivors.map(num => ({ num, score: excludeScores[num] }));
         excludeCandidates.sort((a, b) => b.score !== a.score ? b.score - a.score : a.num - b.num);
         original_exclude = excludeCandidates.slice(0, currentCompress).map(x => x.num).sort((a,b)=>a-b);
 
-        // AI 모드: 전체 번호 중 특수 모드에 선택되지 않은 번호에서 선택
         let excludeSet = new Set(original_exclude);
         let aiCandidates = [];
         for (let i = 1; i <= 45; i++) {
@@ -1478,7 +1540,7 @@ function analyze() {
         original_ai = aiCandidates.slice(0, currentCompress).map(x => x.num).sort((a,b)=>a-b);
     }
 
-    // 7. 트레이드 상태 초기화 및 화면 갱신
+    // 트레이드 상태 초기화
     tradeActive = false;
     document.getElementById('tradeBtn').classList.remove('active');
     integrated14 = [];
@@ -1524,13 +1586,15 @@ function applyCurrentState() {
     let union14 = Array.from(unionSet).sort((a,b)=>a-b);
     let unionMatches = union14.filter(n => winNumbers.includes(n)).length;
     let unionHtml = union14.map(formatNumber).join(' ') + ` (${unionMatches})`;
+
+    // --- 통하28수 행 ---
+    let survivorsHtml = survivors.map(formatNumber).join(' ') + ` (${survivors.length})`;
     
-    // 교집합 (AI ∩ 특수) - 당첨번호 우선 정렬
     let intersection = full14_ai.filter(n => full14_exclude.includes(n));
     intersection.sort((a, b) => {
         let aIsWin = allWinNumbers.includes(a) ? 1 : 0;
         let bIsWin = allWinNumbers.includes(b) ? 1 : 0;
-        return bIsWin - aIsWin; // 당첨번호가 앞으로
+        return bIsWin - aIsWin;
     });
     let topIntersection = intersection.slice(0, currentCompress);
     let topIntersectionMatches = topIntersection.filter(n => winNumbers.includes(n)).length;
@@ -1588,6 +1652,7 @@ function applyCurrentState() {
             <div class="stat-row"><span class="stat-label">🤖AI</span> <div class="number-group">${aiHtml}</div></div>
             <div class="stat-row"><span class="stat-label">🤝교집</span> <div class="number-group">${topIntersectionHtml}</div></div>
             <div class="stat-row"><span class="stat-label">합집</span> <div class="number-group">${unionHtml}</div></div>
+            <div class="stat-row"><span class="stat-label">🧬통하28수</span> <div class="number-group">${survivorsHtml}</div></div>
             ${moveHtml}
             <div class="stat-row"><span class="stat-label">${currentModeLabel}</span> <div class="number-group">${currentModeHtml}</div></div>
             ${lostHtml}
@@ -1600,6 +1665,7 @@ function applyCurrentState() {
             <div class="stat-row"><span class="stat-label">🤖AI</span> <div class="number-group">${aiHtml}</div></div>
             <div class="stat-row"><span class="stat-label">🤝교집</span> <div class="number-group">${topIntersectionHtml}</div></div>
             <div class="stat-row"><span class="stat-label">합집</span> <div class="number-group">${unionHtml}</div></div>
+            <div class="stat-row"><span class="stat-label">🧬통하28수</span> <div class="number-group">${survivorsHtml}</div></div>
             ${moveHtml}
             <div class="stat-row"><span class="stat-label">${currentModeLabel}</span> <div class="number-group">${currentModeHtml}</div></div>
             ${trackHtml}
@@ -1687,9 +1753,10 @@ function setMode(mode) {
     currentMode = mode;
     document.getElementById('modeAiBtn').classList.toggle('active', mode === 'ai');
     document.getElementById('modeExcludeBtn').classList.toggle('active', mode === 'exclude');
-    analyze(); // 모드 변경 시 분석 다시 실행
+    analyze();
 }
 
+// ===== 트레이드 함수 =====
 function toggleTrade() {
     if (tradeActive) {
         tradeActive = false;
@@ -1709,24 +1776,42 @@ function toggleTrade() {
         
         let winData = FULL_DATA.find(r => r[0] === currentBaseRound);
         let winNumbers = customWinningNumbers || (winData ? winData.slice(1, 7) : []);
-        let bonus = customBonus || (winData ? winData[7] : null);
         
         let tc = tradeCount;
 
         beforeIntersection = original_ai.filter(n => original_exclude.includes(n));
 
-        let aiWants = original_exclude.map(num => ({ num, rank: aiRankMap[num] || 45 }))
-            .sort((a,b)=> a.rank !== a.rank ? a.rank - b.rank : a.num - b.num).slice(0, tc).map(x=>x.num);
-            
-        let excludeWants = original_ai.map(num => ({ num, rank: excludeRankMap[num] || 21 }))
-            .sort((a,b)=> a.rank !== a.rank ? a.rank - b.rank : a.num - b.num).slice(0, tc).map(x=>x.num);
-            
-        let aiGives = original_ai.map(num => ({ num, rank: excludeRankMap[num] || 21 }))
-            .sort((a,b)=> b.rank !== a.rank ? b.rank - a.rank : a.num - b.num).slice(0, tc).map(x=>x.num);
-            
-        let excludeGives = original_exclude.map(num => ({ num, rank: aiRankMap[num] || 45 }))
-            .sort((a,b)=> b.rank !== a.rank ? b.rank - a.rank : a.num - b.num).slice(0, tc).map(x=>x.num);
+        // AI가 원하는 번호: 특수 집합에만 있고 AI에는 없는 번호 중 AI 점수 상위 tc개
+        let aiWants = original_exclude
+            .filter(num => !original_ai.includes(num))
+            .map(num => ({ num, rank: aiRankMap[num] || 45 }))
+            .sort((a, b) => a.rank - b.rank)
+            .slice(0, tc)
+            .map(x => x.num);
 
+        // 특수가 원하는 번호: AI 집합에만 있고 특수에는 없는 번호 중 특수 점수 상위 tc개
+        let excludeWants = original_ai
+            .filter(num => !original_exclude.includes(num))
+            .map(num => ({ num, rank: excludeRankMap[num] || 21 }))
+            .sort((a, b) => a.rank - b.rank)
+            .slice(0, tc)
+            .map(x => x.num);
+
+        // AI가 내줄 번호: AI 집합에 있는 번호 중 특수 점수 하위 tc개
+        let aiGives = original_ai
+            .map(num => ({ num, rank: excludeRankMap[num] || 21 }))
+            .sort((a, b) => b.rank - a.rank)
+            .slice(0, tc)
+            .map(x => x.num);
+
+        // 특수가 내줄 번호: 특수 집합에 있는 번호 중 AI 점수 하위 tc개
+        let excludeGives = original_exclude
+            .map(num => ({ num, rank: aiRankMap[num] || 45 }))
+            .sort((a, b) => b.rank - a.rank)
+            .slice(0, tc)
+            .map(x => x.num);
+
+        // 교환 실행
         let newAI = new Set(original_ai);
         aiGives.forEach(num => newAI.delete(num));
         aiWants.forEach(num => newAI.add(num));
@@ -1738,9 +1823,9 @@ function toggleTrade() {
         full14_ai = Array.from(newAI).sort((a,b)=>a-b);
         full14_exclude = Array.from(newExclude).sort((a,b)=>a-b);
 
+        // 이동된 번호 기록
         movedFromAIToExclude = [];
         movedFromExcludeToAI = [];
-
         for (let num of original_ai) {
             if (!newAI.has(num) && newExclude.has(num)) {
                 movedFromAIToExclude.push(num);
@@ -1752,23 +1837,25 @@ function toggleTrade() {
             }
         }
 
+        // 통합 14수 생성 (당첨번호 가중치 없음)
         let unionSet = new Set([...full14_ai, ...full14_exclude]);
         let union = Array.from(unionSet).sort((a,b)=>a-b);
         let scored = union.map(num => {
             let aiRank = aiRankMap[num] || 45;
             let exRank = excludeRankMap[num] || 21;
-            let bonus = (full14_ai.includes(num) && full14_exclude.includes(num)) ? -20 : 0;
+            let bonus = (full14_ai.includes(num) && full14_exclude.includes(num)) ? -20 : 0; // 교집합 가점
             return { num, score: aiRank + exRank + bonus };
         });
-        
         scored.sort((a, b) => a.score !== b.score ? a.score - b.score : a.num - b.num);
         integrated14 = scored.slice(0, currentCompress).map(x => x.num).sort((a,b)=>a-b);
 
+        // 유실 번호 계산
         let afterSet = new Set([...full14_ai, ...full14_exclude]);
         let lostNumbers = Array.from(beforeSet).filter(n => !afterSet.has(n));
         lostNumbersAll = lostNumbers.slice();
         lostWinningNumbers = lostNumbers.filter(n => winNumbers.includes(n));
 
+        // 유실된 교집합 자동 고정 등록
         let lostButWasIntersection = lostNumbersAll.filter(n => beforeIntersection.includes(n));
         if (lostButWasIntersection.length > 0) {
             lostButWasIntersection.forEach(n => {
@@ -1917,13 +2004,11 @@ function processBasket(limit = 5) {
         return;
     }
     
-    // 특수 집합에 선택되지 않은 내 번호 (압축에서 밀려난 번호)
     let unselectedCustom = [];
     if (customSurvivors.length > 0) {
         unselectedCustom = customSurvivors.filter(n => !original_exclude.includes(n));
     }
     
-    // 통합14수(추천) + 유실번호 + 교집합 + 미사용통합 + 이동번호 + 미선택 내 번호
     let baseSet = new Set([
         ...integrated14,
         ...lostNumbersAll,
@@ -1989,10 +2074,8 @@ function generateIntersectionCombos(limit = 5) {
         return;
     }
 
-    // 1. 교집합: 생존수 ∩ B바구니
     let rawIntersection = survivors.filter(n => window.basketBasePool.includes(n));
     
-    // 2. 최근 10회 데이터 수집 (보너스 포함)
     let pastData = FULL_DATA.filter(round => round[0] < currentBaseRound);
     let recentRounds = [];
     for (let i = 0; i < referenceCount; i++) {
@@ -2001,17 +2084,14 @@ function generateIntersectionCombos(limit = 5) {
         if (found) recentRounds.push(found);
     }
     
-    // 3. 최근 10회 동안 출현한 번호(보너스 포함) 집합
     let appearedSet = new Set();
     recentRounds.forEach(round => {
         round.slice(1, 7).forEach(n => appearedSet.add(n));
         appearedSet.add(round[7]);
     });
     
-    // 4. 교집합 중에서 최근 10회 동안 1회 이상 출현한 번호만 필터링
     let filteredIntersection = rawIntersection.filter(n => appearedSet.has(n));
     
-    // 5. 최종 후보 풀 = (정제된 교집합) ∪ 유실번호 ∪ 미선택 내 번호
     let finalPool = [...new Set([...filteredIntersection, ...lostNumbersAll, ...(window.unselectedCustom || [])])];
     
     if (finalPool.length < 6) {
@@ -2019,7 +2099,6 @@ function generateIntersectionCombos(limit = 5) {
         return;
     }
     
-    // 6. 조합 생성
     let fixed = fixedNumbers.slice();
     let candidates = [];
     let attempts = 0;
@@ -2098,7 +2177,6 @@ function showComboList(source = '') {
         let movedSpans = [...movedFromAIToExclude, ...movedFromExcludeToAI].sort((a,b)=>a-b).map(formatNum).join(' ');
         let unselectedSpans = (window.unselectedCustom || []).sort((a,b)=>a-b).map(formatNum).join(' ');
         
-        // 교집합 (생존수 ∩ B바구니)
         let intersection = survivors.filter(n => window.basketBasePool.includes(n));
         let intersectionSpans = intersection.sort((a,b)=>a-b).map(formatNum).join(' ');
         
@@ -2391,7 +2469,6 @@ function stepBaseRound(delta) {
         currentBaseRound = newVal;
         document.getElementById('baseRoundInput').value = currentBaseRound;
 
-        // 저장된 사용자 지정 당첨번호 초기화
         customWinningNumbers = null;
         customBonus = null;
         localStorage.removeItem('lastWinningNumbers');
@@ -2487,6 +2564,90 @@ function clearTrackedNumber() {
     showToast('추적 해제');
 }
 
+// ===== 백테스트 함수 =====
+function openBacktestPopup() {
+    document.getElementById('backtestPopup').style.display = 'flex';
+}
+function closeBacktestPopup() {
+    document.getElementById('backtestPopup').style.display = 'none';
+}
+function runBacktest() {
+    let start = parseInt(document.getElementById('backtestStart').value);
+    let end = parseInt(document.getElementById('backtestEnd').value);
+    if (isNaN(start) || isNaN(end) || start < 901 || end > 1215 || start > end) {
+        alert('올바른 회차 범위를 입력하세요 (901~1215, 시작 ≤ 종료)');
+        return;
+    }
+
+    // 현재 상태 저장
+    let originalRound = currentBaseRound;
+    let originalTradeActive = tradeActive;
+    let originalFixed = fixedNumbers.slice();
+    let originalCustomSurvivors = customSurvivors.slice();
+
+    let results = [];
+    let totalRounds = 0;
+    let matchCounts = [];
+
+    // 잠시 토스트 비활성화 (showToast 오버라이드)
+    let originalShowToast = showToast;
+    showToast = function() {};
+
+    for (let round = start; round <= end; round++) {
+        currentBaseRound = round;
+        // 사용자 정의 당첨번호 초기화 (과거 회차의 실제 당첨번호만 사용)
+        customWinningNumbers = null;
+        customBonus = null;
+
+        analyze(); // survivors, original_ai, original_exclude 등 갱신
+
+        // 트레이드 실행 (현재 상태에 따라)
+        if (originalTradeActive) {
+            // 트레이드가 켜져 있던 상태였다면 켜기
+            if (!tradeActive) toggleTrade();
+        } else {
+            if (tradeActive) toggleTrade();
+        }
+
+        // 추천(integrated14)에 당첨번호가 몇 개 포함되었는지 계산
+        let winData = FULL_DATA.find(r => r[0] === round);
+        let winNumbers = winData ? winData.slice(1, 7) : [];
+        let match = integrated14.filter(n => winNumbers.includes(n)).length;
+        results.push({ round, match, integrated: integrated14.slice() });
+        matchCounts.push(match);
+        totalRounds++;
+    }
+
+    // 원래 상태로 복원
+    currentBaseRound = originalRound;
+    customSurvivors = originalCustomSurvivors;
+    fixedNumbers = originalFixed.slice();
+    updateFixedDisplay();
+    showToast = originalShowToast;
+    analyze(); // 원래 회차로 재분석
+    if (originalTradeActive && !tradeActive) toggleTrade();
+    else if (!originalTradeActive && tradeActive) toggleTrade();
+
+    // 결과 표시
+    let avg = (matchCounts.reduce((a,b)=>a+b,0) / totalRounds).toFixed(2);
+    let distribution = Array(7).fill(0);
+    matchCounts.forEach(m => distribution[m]++);
+    let distText = '';
+    for (let i = 0; i <= 6; i++) {
+        if (distribution[i] > 0) distText += `${i}개: ${distribution[i]}회 (${(distribution[i]/totalRounds*100).toFixed(1)}%)<br>`;
+    }
+
+    let resultHtml = `
+        <div style="margin-bottom:6px;">총 ${totalRounds}회 분석</div>
+        <div style="margin-bottom:6px;">평균 당첨번호 포함 개수: ${avg}</div>
+        <div>분포:<br>${distText}</div>
+        <div style="margin-top:8px; max-height:200px; overflow-y:auto;">
+            ${results.map(r => `🔹 ${r.round}회: ${r.match}개 (${r.integrated.join(', ')})`).join('<br>')}
+        </div>
+    `;
+    document.getElementById('backtestResult').innerHTML = resultHtml;
+}
+
 window.onload = function() {
     initUser();
     document.getElementById('intervalWeeks').value = intervalWeeks;
@@ -2496,7 +2657,6 @@ window.onload = function() {
     document.getElementById('compressSlider').value = currentCompress;
     document.getElementById('compressValue').innerText = currentCompress;
     
-    // 저장된 사용자 생존수 표시
     if (customSurvivors.length > 0) {
         document.getElementById('customSurvivorInput').value = customSurvivors.join(', ');
     }
